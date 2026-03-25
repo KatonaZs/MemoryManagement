@@ -7,7 +7,7 @@ public class MemorySnapshotRecorder implements Recorder<Long> {
     private final List<Long> records = new ArrayList<>();
 
     @Override
-    public void record(final Long value) {
+    public synchronized void record(final Long value) {
         records.add(value);
     }
 
