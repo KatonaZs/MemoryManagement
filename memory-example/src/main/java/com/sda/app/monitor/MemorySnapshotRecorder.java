@@ -7,8 +7,8 @@ public class MemorySnapshotRecorder implements Recorder<Long> {
     private final List<Long> records = new ArrayList<>();
 
     @Override
-    public void record() {
-        records.add(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+    public void record(final Long value) {
+        records.add(value);
     }
 
     @Override

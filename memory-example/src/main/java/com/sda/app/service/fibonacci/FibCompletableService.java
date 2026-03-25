@@ -23,8 +23,8 @@ public class FibCompletableService implements FibComputer {
     private final SupplierResolverService resolverService;
     private final Map<Integer, Integer> concurrentHashMap = new ConcurrentHashMap<>();
 
-    public FibCompletableService(ExecutorService executor, Recorder<Long> recorder,
-                                 ReferenceType type, SupplierResolverService resolverService) {
+    public FibCompletableService(final ExecutorService executor, final Recorder<Long> recorder,
+                                 final ReferenceType type, final SupplierResolverService resolverService) {
         this.executor = executor;
         this.recorder = recorder;
         this.referenceType = type;
@@ -33,7 +33,7 @@ public class FibCompletableService implements FibComputer {
 
     @Override
     public int compute(int n) {
-        recorder.record();
+        recorder.record(getMemoryUsage());
         if (n <= 1) return n;
 
         // Check if the map is already containing the requested n-th fib number
@@ -76,7 +76,11 @@ public class FibCompletableService implements FibComputer {
         return result;
     }
 
-    private Object getRefHolder( Supplier<Integer> supplier) {
+    private Object getRefHolder(final Supplier<Integer> supplier) {
         return referenceType == ReferenceType.SOFT ? new SoftReference<>(supplier) : new WeakReference<>(supplier);
+    }
+
+    private Long getMemoryUsage() {
+        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
 }

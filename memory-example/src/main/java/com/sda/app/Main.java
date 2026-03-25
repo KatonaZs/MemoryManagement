@@ -11,7 +11,7 @@ import com.sda.app.util.ReferenceType;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-public class CompletedJava22Solution {
+public class Main {
 
     public static void main(String[] args) {
         final int n = 28; // tune as desired
@@ -21,7 +21,7 @@ public class CompletedJava22Solution {
         try (ExecutorService executor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory())) {
             // SoftReference run
             final Recorder<Long> softRecorder = new MemorySnapshotRecorder();
-            final Displayer softDisplayer = new SynchronizedHistogramDisplayer(softRecorder);
+            final Displayer softDisplayer = new SynchronizedHistogramDisplayer(softRecorder, System.out);
             FibCompletableService softFib = new FibCompletableService(executor, softRecorder,
                     ReferenceType.SOFT, supplierResolverService);
 
@@ -33,7 +33,7 @@ public class CompletedJava22Solution {
 
             // WeakReference run
             final Recorder<Long> weakRecorder = new MemorySnapshotRecorder();
-            final Displayer weakDisplayer = new SynchronizedHistogramDisplayer(weakRecorder);
+            final Displayer weakDisplayer = new SynchronizedHistogramDisplayer(weakRecorder, System.out);
             FibCompletableService weakFib = new FibCompletableService(executor, weakRecorder,
                     ReferenceType.WEAK, supplierResolverService);
 

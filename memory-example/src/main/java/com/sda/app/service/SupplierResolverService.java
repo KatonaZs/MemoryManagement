@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 public class SupplierResolverService {
 
     @SuppressWarnings("unchecked")
-    public Supplier<Integer> dereferenceSupplier(Object refHolder) {
+    public Supplier<Integer> dereferenceSupplier(final Object refHolder) {
         Supplier<Integer> supplier = null;
 
         if (refHolder instanceof SoftReference) {
