@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,6 +51,23 @@ class SynchronizedHistogramDisplayerTest {
     void displayShouldPrintHistogramsAndClearRecordsWhenRecordsWasProcessed() {
         // GIVEN
         final List<Long> records = new ArrayList<>(List.of(1L));
+        when(recorder.retrieveRecords()).thenReturn(records);
+
+        // WHEN
+        underTest.display("MyLabel");
+
+        // THEN
+        verify(printStream).printf(anyString(), anyDouble(), anyString());
+        verify(printStream).println();
+        verify(recorder).retrieveRecords();
+        verifyNoMoreInteractions(printStream);
+        assertTrue(records.isEmpty());
+    }
+
+    @Test
+    void displayShouldPrintHistogramsClearRecordsAndSkipIfNullWhenRecordsWasProcessed() {
+        // GIVEN
+        final List<Long> records = new ArrayList<>(Arrays.asList(1L, null));
         when(recorder.retrieveRecords()).thenReturn(records);
 
         // WHEN

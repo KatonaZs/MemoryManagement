@@ -120,6 +120,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/util/*</exclude>
+                        <exclude>**/helper/*</exclude>
                         <exclude>**/Main*</exclude>
                     </excludes>
                 </configuration>
@@ -149,7 +150,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.8</minimum>
+                                            <minimum>0.9</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

@@ -39,15 +39,15 @@ public class FibCompletableService implements FibComputer {
         recorder.record();
         if (n <= 1) return n;
 
+        // For small n, avoid async spawn to reduce overhead
+        if (n <= SPAWN_THRESHOLD) {
+            return compute(n - 1) + compute(n - 2);
+        }
+
         // Check if the map is already containing the requested n-th fib number
         Integer currentNumber = concurrentHashMap.get(n);
         if (currentNumber != null) {
             return currentNumber;
-        }
-
-        // For small n, avoid async spawn to reduce overhead
-        if (n <= SPAWN_THRESHOLD) {
-            return compute(n - 1) + compute(n - 2);
         }
 
         // Create a Supplier that computes n-1
