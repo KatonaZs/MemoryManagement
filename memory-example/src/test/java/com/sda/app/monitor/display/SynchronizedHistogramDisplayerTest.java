@@ -40,7 +40,7 @@ class SynchronizedHistogramDisplayerTest {
         underTest.display("TestLabel");
 
         // THEN
-        InOrder inOrder = inOrder(printStream);
+        final InOrder inOrder = inOrder(printStream);
         inOrder.verify(printStream).println(anyString());
         verify(recorder).retrieveRecords();
         verifyNoMoreInteractions(printStream);
@@ -49,7 +49,7 @@ class SynchronizedHistogramDisplayerTest {
     @Test
     void displayShouldPrintHistogramsAndClearRecordsWhenRecordsWasProcessed() {
         // GIVEN
-        List<Long> records = new ArrayList<>(List.of(1L));
+        final List<Long> records = new ArrayList<>(List.of(1L));
         when(recorder.retrieveRecords()).thenReturn(records);
 
         // WHEN
