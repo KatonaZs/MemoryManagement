@@ -1,11 +1,10 @@
 package com.sda.app.service.fibonacci;
 
 import com.sda.app.monitor.Recorder;
+import com.sda.app.service.RefHolderResolverService;
 import com.sda.app.service.SupplierResolverService;
 import com.sda.app.util.ReferenceType;
 
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -17,23 +16,27 @@ public class FibCompletableService implements FibComputer {
 
     // Use a threshold to avoid excessive trivial tasks
     private static final int SPAWN_THRESHOLD = 10;
+
+    private final Map<Integer, Integer> concurrentHashMap = new ConcurrentHashMap<>();
     private final ExecutorService executor;
     private final Recorder<Long> recorder;
     private final ReferenceType referenceType;
-    private final SupplierResolverService resolverService;
-    private final Map<Integer, Integer> concurrentHashMap = new ConcurrentHashMap<>();
+    private final SupplierResolverService supplierResolverService;
+    private final RefHolderResolverService refHolderResolverService;
 
     public FibCompletableService(final ExecutorService executor, final Recorder<Long> recorder,
-                                 final ReferenceType type, final SupplierResolverService resolverService) {
+                                 final ReferenceType type, final SupplierResolverService supplierResolverService,
+                                 final RefHolderResolverService refHolderResolverService) {
         this.executor = executor;
         this.recorder = recorder;
         this.referenceType = type;
-        this.resolverService = resolverService;
+        this.supplierResolverService = supplierResolverService;
+        this.refHolderResolverService = refHolderResolverService;
     }
 
     @Override
     public int compute(int n) {
-        recorder.record(getMemoryUsage());
+        recorder.record();
         if (n <= 1) return n;
 
         // Check if the map is already containing the requested n-th fib number
@@ -51,11 +54,11 @@ public class FibCompletableService implements FibComputer {
         Supplier<Integer> supplier = () -> compute(n - 1);
 
         // Wrap supplier in a SoftReference or WeakReference (for demonstration)
-        Object refHolder = getRefHolder(supplier);
+        Object refHolder = refHolderResolverService.resolveRefHolder(supplier, referenceType);
 
 
         // Safely dereference or recreate supplier if GC cleared it
-        Supplier<Integer> safeSupplier = Optional.ofNullable(resolverService.dereferenceSupplier(refHolder))
+        Supplier<Integer> safeSupplier = Optional.ofNullable(supplierResolverService.dereferenceSupplier(refHolder))
                 .orElseGet(() -> (Supplier<Integer>) (() -> compute(n - 1)));
 
         // Start async subtask on a virtual thread
@@ -74,13 +77,5 @@ public class FibCompletableService implements FibComputer {
         }
 
         return result;
-    }
-
-    private Object getRefHolder(final Supplier<Integer> supplier) {
-        return referenceType == ReferenceType.SOFT ? new SoftReference<>(supplier) : new WeakReference<>(supplier);
-    }
-
-    private Long getMemoryUsage() {
-        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
 }

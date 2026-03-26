@@ -1,20 +1,34 @@
 package com.sda.app.monitor;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class MemorySnapshotRecorderTest {
 
-    private final MemorySnapshotRecorder underTest = new MemorySnapshotRecorder();
+    @Mock
+    private Metric<Long> metric;
+    private MemorySnapshotRecorder underTest;
+
+    @BeforeEach
+    void setup() {
+        underTest = new MemorySnapshotRecorder(metric);
+    }
 
     @Test
     public void recordShouldRegisterANew() {
         // GIVEN
         final Long expectedRecordValue= 2L;
+        when(metric.retrieveCalculatedMetricValue()).thenReturn(expectedRecordValue);
 
         // WHEN
-        underTest.record(expectedRecordValue);
+        underTest.record();
 
         // THEN
         assertEquals(expectedRecordValue, underTest.retrieveRecords().getFirst());
@@ -24,7 +38,8 @@ public class MemorySnapshotRecorderTest {
     public void retrieveRecordsShouldReturnRecordedValue() {
         // GIVEN
         final Long expectedRecordValue= 2L;
-        underTest.record(expectedRecordValue);
+        when(metric.retrieveCalculatedMetricValue()).thenReturn(expectedRecordValue);
+        underTest.record();
 
         // WHEN
         final Long result = underTest.retrieveRecords().getFirst();

@@ -18,7 +18,7 @@ public class SynchronizedHistogramDisplayer implements Displayer {
     }
 
     @Override
-    public synchronized void display(String label) {
+    public synchronized void display(final String label) {
         System.out.println(label + " Memory Usage Histogram:");
         List<Long> records = recorder.retrieveRecords();
         if (records.isEmpty()) {

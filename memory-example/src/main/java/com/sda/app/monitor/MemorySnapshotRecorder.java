@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MemorySnapshotRecorder implements Recorder<Long> {
-    private final List<Long> records = new ArrayList<>();
+    private final static List<Long> RECORDS = new ArrayList<>();
+    private final Metric<Long> metric;
+
+    public MemorySnapshotRecorder(final Metric<Long> metric) {
+        this.metric = metric;
+    }
 
     @Override
-    public synchronized void record(final Long value) {
-        records.add(value);
+    public synchronized void record() {
+        RECORDS.add(metric.retrieveCalculatedMetricValue());
     }
 
     @Override
     public List<Long> retrieveRecords() {
-        return records;
+        return RECORDS;
     }
 }
